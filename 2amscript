@@ -1,0 +1,75 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local badges = ReplicatedStorage:WaitForChild("Badges")
+local checkEnding = ReplicatedStorage:WaitForChild("CheckFirstEnding")
+
+-- Anti kick
+if hookmetamethod then
+    local old
+    old = hookmetamethod(game, "__namecall", function(self, ...)
+        local method = getnamecallmethod()
+        if tostring(self) == "KickEvent" and (method == "FireServer" or method == "fireServer") then
+            return nil
+        end
+        return old(self, ...)
+    end)
+end
+
+pcall(function()
+    checkEnding:InvokeServer()
+end)
+
+local endings = {
+    "BurntHouseEnding",
+    "PoliceEnding",
+    "BananaEnding",
+    "BinBadgeEvent",
+    "DogEnding",
+    "FailedHackEnding3",
+    "FatEnding",
+    "FloodEnding",
+    "GlitchEnding",
+    "GlueEnding2",
+    "GoodEnding",
+    "NoiseEnding",
+    "NukeEnding",
+    "PhoneEnding2",
+    "RanOverEnding",
+    "RobberEnding",
+    "ScammedBadgeEvent",
+    "StarvedEnding",
+    "WeekEnding"
+}
+
+-- Unlock all regular endings
+for _, ending in ipairs(endings) do
+    local remote = badges:FindFirstChild(ending)
+    if remote then
+        remote:FireServer()
+    end
+    task.wait(0.1)
+end
+
+-- Unlock the final morning ending
+local finalEnding = badges:FindFirstChild("ItsMorningEnding")
+if finalEnding then
+    task.wait(0.2)
+    finalEnding:FireServer()
+end
+
+-- Unfreeze character just in case
+local char = player.Character
+if char then
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    
+    if hum then
+        hum.WalkSpeed = 16
+        hum.JumpPower = 50
+    end
+    if hrp then
+        hrp.Anchored = false
+    end
+end
